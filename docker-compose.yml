@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./reservation-salle-api  # Chemin vers le répertoire contenant le code source du backend
+      dockerfile: Dockerfile  # Chemin vers le Dockerfile du backend
+    ports:
+      - "8080:8080"  # Mapper le port 8080 du conteneur au port 8080 de l'hôte
+    environment:
+      SPRING_PROFILES_ACTIVE: "docker"  # Activer le profil "docker" pour la configuration Spring Boot
+    depends_on:
+      - database  # Attendre que le service database soit démarré avant de démarrer le backend
+
+  database:
+    image: "openjdk:17-jdk-slim"  # Utiliser une image JDK 17 comme base pour le conteneur de la base de données H2
+    command: ["java", "-jar", "/path/to/h2.jar", "-tcpAllowOthers"]  # Lancer H2 en mode TCP pour permettre la connexion du backend
+    volumes:
+      - ./data:/data  # Monter un volume pour persister les données de la base de données
+    ports:
+      - "1521:1521"  # Mapper le port 1521 du conteneur au port 1521 de l'hôte
+
+  frontend:
+    build: 
+      context: ./reservation-salle-front  # Chemin vers le répertoire contenant le code source du frontend
+      dockerfile: Dockerfile  # Chemin vers le Dockerfile du frontend
+    ports:
+      - "5173:80"  # Mapper le port 5173 du conteneur au port 80 de l'hôte
