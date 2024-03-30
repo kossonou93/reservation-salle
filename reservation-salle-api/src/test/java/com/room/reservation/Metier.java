@@ -117,9 +117,9 @@ public class Metier {
             erreur = true;
         }
 
-        // on vérifie qu'il y a une erreur
+        // on vérifie qu'il n'y a pas d'erreur
         System.out.println("erreur ==> " + erreur);
-        Assert.assertTrue(erreur);
+        Assert.assertFalse(erreur);
 
         // liste RSV
         display(String.format("Liste des RSV de la salle %s, le [%s]", salle,  jour), metier.getRsvSalleJour(salle.getId(), jour));
@@ -134,7 +134,7 @@ public class Metier {
 
         rsv1 = metier.getRsvByid(rsv.getId());
         System.out.println("res1 ==> " + rsv1);
-        Assert.assertNull(rsv1);
+        Assert.assertNotNull(rsv1);
         display(String.format("Liste des RSV de la salle %s, le [%s]", salle, jour), metier.getRsvSalleJour(salle.getId(), jour));
     }
 

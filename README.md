@@ -13,3 +13,6 @@ docker-compose up
 
 Ensuite d'ouvrir un navigateur et mettre le lien suivant:
 localhost:5173
+
+# lien swagger
+http://localhost:8080/swagger-ui/index.html#/

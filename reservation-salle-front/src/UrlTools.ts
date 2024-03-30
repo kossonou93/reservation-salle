@@ -2,9 +2,27 @@
 
 
 export const getUriSalle = (url: string) => {
-    const baseUri = "http://192.168.1.19"
+    const baseUri = "http://localhost"
     const port= "8080"
     return `${baseUri}:${port}/api/rsv/${url}`
+}
+
+export const getUriUser = (url: string) => {
+    const baseUri = "http://localhost"
+    const port= "8080"
+    return `${baseUri}:${port}/api/user/${url}`
+}
+
+export const getUriRsv = (url: string) => {
+    const baseUri = "http://localhost"
+    const port= "8080"
+    return `${baseUri}:${port}/api/rsv/${url}`
+}
+
+export const getUriCreneau = (url: string) => {
+    const baseUri = "http://localhost"
+    const port= "8080"
+    return `${baseUri}:${port}/api/creneau/${url}`
 }
 
 

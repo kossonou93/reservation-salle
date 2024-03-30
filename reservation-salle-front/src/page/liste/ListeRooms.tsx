@@ -12,9 +12,17 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import axios from "axios";
+import {getUriSalle} from "../../UrlTools";
+import {Salle} from "../../model/salle.model";
 
  const ListeRooms =  () => {
 
+     const [ salles , setSalles ] = useState<Salle[]>([]);
+
+     useEffect(() => {
+         getSalles()
+     }, [])
 
     const handleChange = (event: SelectChangeEvent) => {
       //  setStatus(event.target.value);
@@ -25,6 +33,17 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
     const  loadListRooms = () => {
         console.log("Load data")
     }
+
+     const getSalles = () => {
+         axios.get(getUriSalle("salles")).then((response) => {
+             console.log(response)
+             if (response.hasOwnProperty("data")) {
+                 setSalles(response.data.object)
+             }
+         }).catch(error => {
+             setSalles([])
+         })
+     }
 
     return (
         <Card>
@@ -54,14 +73,20 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
                         <TableHead>
                             <TableRow>
                                 <TableCell>#</TableCell>
-                                <TableCell align="right">Room</TableCell>
-                                <TableCell align="right">state</TableCell>
-                                <TableCell align="right">count</TableCell>
+                                <TableCell align="right">Nom</TableCell>
+                                <TableCell align="right">Description</TableCell>
                                 <TableCell align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-
+                            {salles.map((salle, index) => (
+                                <TableRow key={index}>
+                                    <TableCell component="th" scope="row">{index + 1}</TableCell>
+                                    <TableCell align="right">{salle.name}</TableCell>
+                                    <TableCell align="right">{salle.description}</TableCell>
+                                    <TableCell align="right">Actions</TableCell>
+                                </TableRow>
+                            ))}
                         </TableBody>
                     </Table>
                 </TableContainer>

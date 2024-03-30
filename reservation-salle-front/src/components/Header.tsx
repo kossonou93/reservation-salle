@@ -75,7 +75,7 @@ export  default () =>  {
                                    to={route.path}
                                >
                                    <MenuItem key={index} onClick={handleCloseNavMenu}>
-                                       <Typography textAlign="center">{route.name}</Typography>
+                                       <Typography textAlign="center" style={{ color: 'white' }}>{route.name}</Typography>
                                    </MenuItem>
                                </NavLink>
                             ))}
@@ -107,7 +107,7 @@ export  default () =>  {
                                 to={route.path}
                             >
                                 <MenuItem key={index} onClick={handleCloseNavMenu}>
-                                    <Typography textAlign="center">{route.name}</Typography>
+                                    <Typography textAlign="center" style={{ color: 'white' }}>{route.name}</Typography>
                                 </MenuItem>
                             </NavLink>
                         ))}
