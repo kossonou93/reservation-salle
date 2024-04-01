@@ -41,4 +41,15 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public User getByUsername(String username) {
+        User res = null;
+        try {
+            res = userRepository.findByUsername(username);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return res;
+    }
 }

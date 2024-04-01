@@ -7,47 +7,143 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import  { SelectChangeEvent } from '@mui/material/Select';
 import FullCalendar from "@fullcalendar/react";
-import {useEffect, useState} from "react"; // a plugin!
+import React, {useEffect, useState} from "react"; // a plugin!
 import interactionPlugin from "@fullcalendar/interaction"
 import axios from "axios";
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import {getUriSalle} from "../../UrlTools"; // needed for dayClick
+import CloseIcon from '@mui/icons-material/Close'
+import {getUriSalle, getUriUser} from "../../UrlTools"; // needed for dayClick
+import Modal from '@mui/material/Modal';
+import Typography from '@mui/material/Typography';
+import {Salle} from "../../model/salle.model";
+import {Creneau} from "../../model/creneau.model";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import TableContainer from "@mui/material/TableContainer";
+import {CreneauSalle} from "../../model/creneau-salle.model";
+import IconButton from "@mui/material/IconButton";
+import {useNavigate} from "react-router-dom";
+import {User} from "../../model/user.model";
+import {Rsv} from "../../model/rsv.model";
+import {RsvPost} from "../../model/rsv-post.model";
+
 export const ReservedRoom =  () => {
+    const navigate = useNavigate()
     const [ salle , setSalle ] = useState("");
-    const [ salles , setSalles ] = useState([]);
-    const [showCrenaux , setShowCreneau] = useState(false)
+    const [ salles , setSalles ] = useState<Salle[]>([]);
+    const [showCrenaux , setShowCreneau] = useState(false);
+    const [open, setOpen] = React.useState(false);
+    const [creneau, setCreneau] = useState<Creneau>();
+    const [crenaux, setCreneaux] = useState<Creneau[]>([]);
+    const [crenauSalles, setCreneauSalles] = useState<CreneauSalle[]>([]);
+    const [user, setUser] = useState<User>();
+    const [rsv, setRsv] = useState<RsvPost>({
+        jour: "",
+        user: 0,
+        creneau: 0
+    });
+    const handleOpen = () => setOpen(true);
+    /*const handleClose = () => {
+        setShowCreneau(false);
+    };*/
 
     useEffect(() => {
-        getSalles()
-    }, [])
+        /*if (localStorage.getItem('token')!== ""){
+            navigate('/');
+            toast.success("Vous êtes connecté!");
+        }*/
+    })
 
-    const handleClose = () => {
-        setShowCreneau(false);
+    const handleClose = () => setOpen(false);
+
+    const style = {
+        position: 'absolute' as 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 600,
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
     };
+
+    useEffect(() => {
+        getSalles();
+    }, [])
 
     const handleChange = (e: any) => {
         setSalle(e.target.value)
     }
 
     const handleDateClick = (arg: any) => {
-        alert(arg.dateStr)
-        setShowCreneau(true)
+        //alert("test ======> "+ arg.dateStr)
+        handleOpen();
+        getCreneaux(parseInt(salle), arg.dateStr);
+        setRsv(prevState => ({
+            ...prevState,
+            jour: arg.dateStr,
+        }));
+        //setShowCreneau(true)
+    }
+
+    const handleReservation = (id: number) => {
+        setRsv(prevState => ({
+            ...prevState,
+            creneau: id,
+        }));
+        if (localStorage.getItem('token') === ""){
+            navigate('/login');
+        }else{
+            getUser();
+            console.log(user);
+            console.log(rsv);
+           if (!user){
+               axios.post(getUriSalle(`ajouter-rsv`), rsv).then((response) => {
+                   if (response.hasOwnProperty("data")) {
+                   }
+               }).catch(error => {
+               })
+           }
+        }
+    }
+
+    const getUser = () => {
+        axios.get(getUriUser(`getbyusername/${localStorage.getItem('user')}`)).then((response) => {
+            if (response.hasOwnProperty("data")) {
+                setUser(response.data.object)
+                setRsv(prevState => ({
+                    ...prevState,
+                    user: response.data.object.id,
+                }));
+            }
+        }).catch(error => {
+        })
     }
 
 
     const getSalles = () => {
        axios.get(getUriSalle("salles")).then((response) => {
-           console.log(response)
            if (response.hasOwnProperty("data")) {
                setSalles(response.data.object)
            }
        }).catch(error => {
            setSalles([])
        })
+    }
+
+    const getCreneaux = (idSalle: number, jour: string) => {
+        axios.get(getUriSalle(`agenda-salle/${idSalle}/${jour}`)).then((response)=> {
+            console.log(response);
+            if (response.hasOwnProperty("data")){
+                setCreneauSalles(response.data.object.creneauxSalle);
+            }
+        }).catch(error => {
+            setCreneaux([]);
+        })
     }
 
     return (
@@ -83,28 +179,55 @@ export const ReservedRoom =  () => {
                 />
 
             </CardBody>
-            <Dialog
-                open={showCrenaux}
-                onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Use Google's location service?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Let Google help apps determine location. This means sending anonymous
-                        location data to Google, even when no apps are running.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Fermer</Button>
-                    <Button onClick={handleClose} autoFocus>
-                        Valider
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <div>
+                <Modal
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Liste des Créneaux
+                        </Typography>
+                        <IconButton
+                            aria-label="Fermer"
+                            onClick={handleClose}
+                            sx={{ position: 'absolute', top: 0, right: 0 }}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                        <div>
+                            <TableContainer component={Paper}>
+                                <Table sx={{ minWidth: 100 }} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>#</TableCell>
+                                            <TableCell align="right">Heure Début</TableCell>
+                                            <TableCell align="right">Heure Fin</TableCell>
+                                            <TableCell align="right">Réserver</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {crenauSalles.filter(cs => cs.rsv === null).map((cs, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell component="th" scope="row">{index + 1}</TableCell>
+                                                <TableCell align="right">{cs.creneau.hdebut}h:{cs.creneau.mdebut}</TableCell>
+                                                <TableCell align="right">{cs.creneau.hfin}h:{cs.creneau.mfin}</TableCell>
+                                                <TableCell align="right">
+                                                    <button className="lButton" onClick={() => handleReservation(cs.creneau.id!)}>
+                                                        Réserver
+                                                    </button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </div>
+                    </Box>
+                </Modal>
+            </div>
         </Card>
     )
 }

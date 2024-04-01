@@ -41,7 +41,13 @@ public class UserController extends BaseController<User>{
             );
             System.out.println("authentication ===> " + authentication);
             if (authentication.isAuthenticated()) {
-                return JwtResponseDTO.builder().accessToken(jwtService.GenerateToken(authRequestDTO.getUsername())).build();
+                String accessToken = jwtService.GenerateToken(authRequestDTO.getUsername());
+                int status = 0;
+
+                return JwtResponseDTO.builder()
+                        .accessToken(accessToken)
+                        .status(status)
+                        .build();
             } else {
                 throw new UsernameNotFoundException("Invalid user credentials.");
             }
@@ -54,4 +60,15 @@ public class UserController extends BaseController<User>{
     public User register(@RequestBody User user){
         return iUserService.enregistrer(user);
     }*/
+    @GetMapping("/getbyusername/{username}")
+    public Response getUserByUsername(@PathVariable String username) {
+        User u = null;
+        try {
+            u = iUserService.getByUsername(username);
+        } catch (Exception e) {
+            return new Response(1,null);
+        }
+        return new Response(0, u);
+    }
+
 }

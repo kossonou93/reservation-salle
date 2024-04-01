@@ -21,6 +21,7 @@ public class BaseController <T>{
 
     @PostMapping("/enregistrer")
     public Response enregistrer(@RequestBody T entity) {
+        System.out.println("entity ==> " + entity);
         T res;
         try {
             res = baseservice.enregistrer(entity);

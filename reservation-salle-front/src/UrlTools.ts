@@ -1,4 +1,4 @@
-
+import {User} from "./model/user.model";
 
 
 export const getUriSalle = (url: string) => {
@@ -7,7 +7,7 @@ export const getUriSalle = (url: string) => {
     return `${baseUri}:${port}/api/rsv/${url}`
 }
 
-export const getUriUser = (url: string) => {
+export const getUriUser = (url: string, user?: User) => {
     const baseUri = "http://localhost"
     const port= "8080"
     return `${baseUri}:${port}/api/user/${url}`

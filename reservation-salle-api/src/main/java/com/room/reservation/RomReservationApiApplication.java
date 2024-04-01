@@ -41,7 +41,7 @@ public class RomReservationApiApplication {
 
 	@PostConstruct
 	public void init() throws NotFoundException{
-		createRole();
+		//createRole();
 		//createUser();
 		createSalle();
 		createCreneau();
