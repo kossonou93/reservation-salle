@@ -4,6 +4,6 @@ import {Creneau} from "./creneau.model";
 export interface RsvPost{
     id?: number;
     jour?: string;
-    user?: number;
-    creneau?: number;
+    idCreneau?: number;
+    idUser?: number;
 }

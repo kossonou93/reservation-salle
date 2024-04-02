@@ -1,11 +1,18 @@
 package com.room.reservation.service;
 
+import com.room.reservation.dto.UserDTO;
+import com.room.reservation.model.Role;
 import com.room.reservation.model.User;
+import com.room.reservation.repository.RoleRepository;
 import com.room.reservation.repository.UserRepository;
 import com.room.reservation.service.face.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
@@ -16,20 +23,25 @@ public class UserService implements IUserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     @Override
-    public User enregistrer(User user) {
+    public UserDTO enregistrer(UserDTO userDTO) {
         User res = null;
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        User user = convertDtoToEntity(userDTO);
         try {
             res = userRepository.save(user);
         } catch (Exception e){
             e.printStackTrace();
         }
-        return res;
+
+        return convertEntityToDTO(res);
     }
 
     @Override
-    public User modifier(User user) {
+    public UserDTO modifier(UserDTO userDTO) {
         return null;
     }
 
@@ -51,5 +63,38 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
         return res;
+    }
+
+    @Override
+    public UserDTO convertEntityToDTO(User user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setEmail(user.getEmail());
+        userDTO.setUsername(user.getUsername());
+        userDTO.setContact(user.getContact());
+        userDTO.setPassword(user.getPassword());
+        List<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
+        userDTO.setRoles(roles);
+        return userDTO;
+    }
+
+    @Override
+    public User convertDtoToEntity(UserDTO userDTO) {
+        User user = new User();
+        user.setEmail(userDTO.getEmail());
+        user.setUsername(userDTO.getUsername());
+        user.setContact(userDTO.getContact());
+        user.setPassword(userDTO.getPassword());
+        List<Role> roles = new ArrayList<>();
+        for (String role: userDTO.getRoles()) {
+            Role existingRole = roleRepository.findByName(role).get();
+            if (existingRole == null){
+                throw new IllegalArgumentException("Le role " + role + " n'existe pas.");
+            }
+            roles.add(existingRole);
+        }
+        user.setRoles(roles);
+        return user;
     }
 }

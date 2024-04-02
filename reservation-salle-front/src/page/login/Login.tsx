@@ -7,33 +7,47 @@ import {LoginType} from "../../model/login.model";
 import {useForm} from "react-hook-form";
 import {getUriUser} from "../../UrlTools";
 import { jwtDecode } from 'jwt-decode';
+import {User} from "../../model/user.model";
+import {toaster} from "evergreen-ui";
 
 function Login  ()   {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const [userForm, setForm] = useState<LoginType>({
         username: "",
         password: "",
     });
 
     useEffect(() => {
-        /*if (localStorage.getItem('token')!== ""){
-            navigate('/');
-            toast.success("Vous êtes connecté!");
-        }*/
+        if (localStorage.getItem('token') !== "" && localStorage.getItem('token') !== null){
+            navigate('/reserved-room');
+            toaster.success("NOTIFICATION", {
+                description: "Vous êtes déjà connecté!"
+            });
+        }
     })
+
+    const getUser = (username: string) => {
+        axios.get(getUriUser(`getbyusername/${username}`)).then((response) => {
+            if (response.hasOwnProperty("data")) {
+                console.log(response.data.object);
+                localStorage.setItem('user', JSON.stringify(response.data.object));
+            }
+        }).catch(error => {
+        })
+    }
 
     const {handleSubmit} = useForm();
 
     function onSubmit(data: any): any{
         axios.post(getUriUser(`login`), userForm).then((response) => {
             if (response.data.status===0){
-                const user: string = jwtDecode(response.data.accessToken).sub!;
+                const username: string = jwtDecode(response.data.accessToken).sub!;
                 localStorage.setItem('token', response.data.accessToken);
-                localStorage.setItem('user', user);
+                getUser(username);
                 console.log(response.data.accessToken);
                 // Mise à jour de l'état avec les données décodées
                 toast.success("Vous êtes connecté!");
-                navigate('/');
+                navigate('/reserved-room');
             }else {
                 toast.error("Username ou password incorrect!");
             }
@@ -41,7 +55,6 @@ function Login  ()   {
     }
 
     const registerUser = () => {
-        //setData({});
         navigate('/register')
     }
 

@@ -3,6 +3,7 @@ package com.room.reservation.controller;
 import com.room.reservation.config.JwtService;
 import com.room.reservation.dto.AuthRequestDTO;
 import com.room.reservation.dto.JwtResponseDTO;
+import com.room.reservation.dto.UserDTO;
 import com.room.reservation.model.User;
 import com.room.reservation.service.IBaseService;
 import com.room.reservation.service.face.IUserService;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(value = { "*" }, exposedHeaders = { "Content-Disposition" })
 @RequestMapping(path = "/api/user")
-public class UserController extends BaseController<User>{
+public class UserController extends BaseController<UserDTO>{
 
     @Autowired
     private IUserService iUserService;
@@ -29,7 +30,7 @@ public class UserController extends BaseController<User>{
     @Autowired
     AuthenticationManager authenticationManager;
 
-    public UserController(IBaseService<User> baseService){
+    public UserController(IBaseService<UserDTO> baseService){
         super(baseService);
     }
 

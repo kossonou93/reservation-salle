@@ -7,6 +7,7 @@ import {RouterApp} from "./router";
 
 import Loader from "./components/Loader";
 import Dashboad from "./page/dashboad/Dashboad";
+import Login from "./page/login/Login";
 
 const App = () => {
 
@@ -16,7 +17,7 @@ const App = () => {
         >
             <Routes>
                 <Route element={<RoomM />}>
-                    <Route index element={<Dashboad />} />
+                    <Route index element={<Login />} />
                     {RouterApp.map((route: any, index: any) => {
                         return (
                             <Route

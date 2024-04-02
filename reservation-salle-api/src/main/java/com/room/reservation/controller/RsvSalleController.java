@@ -222,9 +222,10 @@ public class RsvSalleController {
              return new Response(-1, messages);
              }
              // on récupère les valeurs postées
+        System.out.println("la valeur de post ==> " + post);
              String jour = post.getJour();
-             long idCreneau = post.getIdCreneau();
-             long idUser = post.getIdUser();
+             Long idCreneau = post.getIdCreneau();
+             Long idUser = post.getIdUser();
              // on vérifie la date
              Date jourAgenda = null;
              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

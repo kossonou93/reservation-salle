@@ -26,9 +26,8 @@ import TableContainer from "@mui/material/TableContainer";
 import {CreneauSalle} from "../../model/creneau-salle.model";
 import IconButton from "@mui/material/IconButton";
 import {useNavigate} from "react-router-dom";
-import {User} from "../../model/user.model";
-import {Rsv} from "../../model/rsv.model";
 import {RsvPost} from "../../model/rsv-post.model";
+import {toaster} from "evergreen-ui";
 
 export const ReservedRoom =  () => {
     const navigate = useNavigate()
@@ -39,23 +38,15 @@ export const ReservedRoom =  () => {
     const [creneau, setCreneau] = useState<Creneau>();
     const [crenaux, setCreneaux] = useState<Creneau[]>([]);
     const [crenauSalles, setCreneauSalles] = useState<CreneauSalle[]>([]);
-    const [user, setUser] = useState<User>();
     const [rsv, setRsv] = useState<RsvPost>({
         jour: "",
-        user: 0,
-        creneau: 0
+        idUser: 0,
+        idCreneau: 0
     });
     const handleOpen = () => setOpen(true);
     /*const handleClose = () => {
         setShowCreneau(false);
     };*/
-
-    useEffect(() => {
-        /*if (localStorage.getItem('token')!== ""){
-            navigate('/');
-            toast.success("Vous êtes connecté!");
-        }*/
-    })
 
     const handleClose = () => setOpen(false);
 
@@ -73,57 +64,60 @@ export const ReservedRoom =  () => {
 
     useEffect(() => {
         getSalles();
+        const userString = localStorage.getItem('user');
+        if (userString) {
+            const user = JSON.parse(userString);
+            const id = user.id;
+            setRsv(prevState => ({
+                ...prevState,
+                idUser: id,
+            }));
+        } else {
+        }
     }, [])
 
     const handleChange = (e: any) => {
-        setSalle(e.target.value)
+        setSalle(e.target.value);
     }
 
     const handleDateClick = (arg: any) => {
-        //alert("test ======> "+ arg.dateStr)
-        handleOpen();
-        getCreneaux(parseInt(salle), arg.dateStr);
-        setRsv(prevState => ({
-            ...prevState,
-            jour: arg.dateStr,
-        }));
+        if (!salle){
+            toaster.danger("NOTIFICATION", {
+                description: "Veillez sélectionner la salle svp!"
+            });
+        }else{
+            handleOpen();
+            getCreneaux(parseInt(salle), arg.dateStr);
+            setRsv(prevState => ({
+                ...prevState,
+                jour: arg.dateStr,
+            }));
+        }
         //setShowCreneau(true)
     }
 
     const handleReservation = (id: number) => {
         setRsv(prevState => ({
             ...prevState,
-            creneau: id,
+            idCreneau: id,
         }));
-        if (localStorage.getItem('token') === ""){
+        if (localStorage.getItem('token') === "" && localStorage.getItem('token') === null){
+            toaster.danger("NOTIFICATION", {
+                description: "Veillez vous connecter!"
+            });
             navigate('/login');
         }else{
-            getUser();
-            console.log(user);
-            console.log(rsv);
-           if (!user){
-               axios.post(getUriSalle(`ajouter-rsv`), rsv).then((response) => {
-                   if (response.hasOwnProperty("data")) {
-                   }
-               }).catch(error => {
-               })
-           }
+           axios.post(getUriSalle(`ajouter-rsv`), {"jour": rsv.jour, "idUser": rsv.idUser, "idCreneau": id}).then((response) => {
+               if (response.hasOwnProperty("data")) {
+                   handleClose();
+                   toaster.success("NOTIFICATION", {
+                       description: "La salle à été réservée avec succès!"
+                   });
+               }
+           }).catch(error => {
+           })
         }
     }
-
-    const getUser = () => {
-        axios.get(getUriUser(`getbyusername/${localStorage.getItem('user')}`)).then((response) => {
-            if (response.hasOwnProperty("data")) {
-                setUser(response.data.object)
-                setRsv(prevState => ({
-                    ...prevState,
-                    user: response.data.object.id,
-                }));
-            }
-        }).catch(error => {
-        })
-    }
-
 
     const getSalles = () => {
        axios.get(getUriSalle("salles")).then((response) => {
@@ -137,7 +131,6 @@ export const ReservedRoom =  () => {
 
     const getCreneaux = (idSalle: number, jour: string) => {
         axios.get(getUriSalle(`agenda-salle/${idSalle}/${jour}`)).then((response)=> {
-            console.log(response);
             if (response.hasOwnProperty("data")){
                 setCreneauSalles(response.data.object.creneauxSalle);
             }

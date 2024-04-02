@@ -30,10 +30,11 @@ function Register  ()   {
     const {handleSubmit} = useForm();
 
     function onSubmit(data: any): any{
-        userForm.roles = [{"id":0, "version": 0, "name": "ROLE_USER"}];
+        userForm.roles = ["ROLE_USER"];
         console.log("userForm ===> " + userForm.roles);
         axios.post(getUriUser(`enregistrer`), userForm).then((response) => {
-            if (response.status===0){
+            console.log(response);
+            if (response.data.status===0){
                 toast.success("Enregistrement éffectuer avec succès");
                 navigate('/login');
             }else {

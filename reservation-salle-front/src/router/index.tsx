@@ -8,10 +8,10 @@ import Login from "../page/login/Login";
 import Register from "../page/register/Register";
 
 export const RouterApp = [
-    {path: "/", element: <Dashboad />, name: "Dashboad" },
-    {path: "/login", element: <Login />, name: "Login"},
-    {path: "/register", element: <Register /> , name: "Register"},
-    {path: "/rooms" , element: <ListeRooms /> , name: "rooms" },
-    {path: "/agenda-room" , element: <AgendaRooms />  , name: "agenda-rooms"},
-    {path: "/reserved-room" , element: <ReservedRoom /> , name: "reserved-room" },
+    {path: "/", element: <Dashboad />, name: "Dashboad", auth: true},
+    {path: "/login", element: <Login />, name: "Login", auth: false},
+    {path: "/register", element: <Register /> , name: "Register", auth: false},
+    {path: "/rooms" , element: <ListeRooms /> , name: "rooms", auth: true},
+    {path: "/agenda-room" , element: <AgendaRooms />  , name: "agenda-rooms", auth: true},
+    {path: "/reserved-room" , element: <ReservedRoom /> , name: "reserved-room", auth: true }
 ]

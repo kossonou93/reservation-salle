@@ -1,4 +1,20 @@
 package com.room.reservation.dto;
 
-public record UserDTO(Long id, String email, String username, String password, String contact) {
+import lombok.*;
+
+import java.util.List;
+
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserDTO {
+    private Long id;
+    private String email;
+    private String username;
+    private String password;
+    private String contact;
+
+    private List<String> roles;
 }

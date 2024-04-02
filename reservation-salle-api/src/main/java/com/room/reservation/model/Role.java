@@ -13,8 +13,5 @@ import lombok.*;
 public class Role extends AbstractEntity{
 
     private static final long serialVersionUID = 1L;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 15)
-    private ERole name;
+    private String name;
 }

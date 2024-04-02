@@ -23,7 +23,7 @@ public class CustomUserDetails extends User implements UserDetails {
 
         for(Role role : byUsername.getRoles()){
 
-            auths.add(new SimpleGrantedAuthority(role.getName().name().toUpperCase()));
+            auths.add(new SimpleGrantedAuthority(role.getName().toUpperCase()));
         }
         this.authorities = auths;
     }

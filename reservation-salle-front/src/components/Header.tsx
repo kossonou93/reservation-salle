@@ -13,11 +13,13 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { RouterApp } from '../router';
-import { NavLink } from 'react-router-dom';
+import {NavLink, useNavigate} from 'react-router-dom';
+import {toaster} from "evergreen-ui";
 
 const settings = [ 'Logout'];
 
 export  default () =>  {
+    const navigate = useNavigate();
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -28,11 +30,33 @@ export  default () =>  {
         setAnchorElUser(event.currentTarget);
     };
 
+    const checkUser = () => {
+        return localStorage.getItem('token') !== "" && localStorage.getItem('token') !== null;
+    }
+
+    const getMenu = (route: any, index: number, isAuth: boolean) => {
+        //if(route.auth && checkUser()){
+            return (route.auth === isAuth?
+                <NavLink
+                key={index}
+                to={route.path}
+            >
+                <MenuItem key={index} onClick={handleCloseNavMenu}>
+                    <Typography textAlign="center" style={{ color: 'white' }}>{route.name}</Typography>
+                </MenuItem>
+            </NavLink> : null)
+    }
+
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
     };
 
     const handleCloseUserMenu = () => {
+        localStorage.clear();
+        navigate('/login');
+        toaster.success("NOTIFICATION", {
+            description: "Vous êtes déconnecté!"
+        });
         setAnchorElUser(null);
     };
 
@@ -69,16 +93,7 @@ export  default () =>  {
                                 display: { xs: 'block', md: 'none' },
                             }}
                         >
-                            {RouterApp.map((route, index) => (
-                               <NavLink
-                                   key={index}
-                                   to={route.path}
-                               >
-                                   <MenuItem key={index} onClick={handleCloseNavMenu}>
-                                       <Typography textAlign="center" style={{ color: 'white' }}>{route.name}</Typography>
-                                   </MenuItem>
-                               </NavLink>
-                            ))}
+                            {RouterApp.map((route, index) => getMenu(route, index, checkUser()))}
                         </Menu>
                     </Box>
                     <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -101,16 +116,7 @@ export  default () =>  {
                         RoomM
                     </Typography>
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                        {RouterApp.map((route, index) => (
-                            <NavLink
-                                key={index}
-                                to={route.path}
-                            >
-                                <MenuItem key={index} onClick={handleCloseNavMenu}>
-                                    <Typography textAlign="center" style={{ color: 'white' }}>{route.name}</Typography>
-                                </MenuItem>
-                            </NavLink>
-                        ))}
+                        {RouterApp.map((route, index) => getMenu(route, index, checkUser()))}
                     </Box>
 
                     <Box sx={{ flexGrow: 0 }}>
